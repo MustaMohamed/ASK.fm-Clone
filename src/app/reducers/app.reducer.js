@@ -1,7 +1,5 @@
 
-const initialState = {
-    message: null,
-};
+const initialState = {};
 
 export function app(state = initialState, action) {
     switch (action.type) {
