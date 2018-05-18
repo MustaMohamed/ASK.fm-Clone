@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import {appActions} from '../actions/app.action';
-import  router  from '../utils/router/router';
+import  router  from '../router/router';
 // CSS stye
 // import style from '../css/style.css';
 
