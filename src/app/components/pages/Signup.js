@@ -3,10 +3,12 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {
     Container, Menu, Button, Header,
-    Divider, Icon, Grid, Input, Dropdown
+    Divider, Icon, Grid, Input, Dropdown,
+    Popup
 } from 'semantic-ui-react';
-
-
+import { validationConstants } from '../../utils/constants/index';
+import { userActions } from '../../actions/index';
+import { validationServices } from '../../services/index';
 
 // CSS stye
 // import style from '../../css/style.css';
@@ -25,11 +27,34 @@ class Signup extends React.Component {
             days,
             months,
             years,
-            userEmail: {},
-            userFullName: {},
-            userName: {},
-            userPassword: {},
-            userData: {}
+            userEmail: {
+                validationRules: [
+                    { ...validationConstants.notNull },
+                    { ...validationConstants.isEmail }
+                ]
+            },
+            userFullName: {
+                validationRules: [
+                    { ...validationConstants.notNull },
+                    { ...validationConstants.noSpecialCharacters },
+                    { ...validationConstants.notLongerThan, values: { validationLength: 20 } }
+                ]
+            },
+            userName: {
+                validationRules: [
+                    { ...validationConstants.notNull },
+                    { ...validationConstants.noSpecialCharacters },
+                ]
+            },
+            userPassword: {
+                validationRules: [
+                    { ...validationConstants.notNull },
+                    { ...validationConstants.notLongerThan, values: { validationLength: 20 } },
+                    { ...validationConstants.notLessThan, values: { validationLength: 6 } }
+                ]
+            },
+            userBirthday: {},
+            error: false
         };
         this._submit = this._submit.bind(this);
         this._handleInputChange = this._handleInputChange.bind(this);
@@ -66,10 +91,73 @@ class Signup extends React.Component {
 
     _handleInputChange(e, data) {
         // console.log(data);
+        let inputName = data.name, inputValue = data.value;
+        this.setState(Object.assign(this.state, {
+            [inputName]: Object.assign(this.state[inputName], {
+                ...this.state[inputName],
+                value: inputValue
+            })
+        }));
     }
 
     _submit() {
+        if (this._registerValid()) {
+            const { userEmail, userFullName, userName, userPassword, userBirthday } = this.state;
+            let userData = {
+                fullName: userFullName.value,
+                userName: userName.value,
+                email: userEmail.value,
+                password: userPassword.value,
+                birthday: userBirthday,
+            };
+            const { dispatch } = this.props;
+            dispatch(userActions.Register(userData));
+        } else {
+            this.setState({ error: true });
+            console.log(!!this.state.userPassword.currentErrorMessage);
+        }
+    }
 
+    _registerValid() {
+        // values to validate
+        const keys = ['userPassword', 'userFullName', 'userName', 'userEmail', 'userBirthday'];
+
+        // prev state
+        let config = this.state;
+
+        // errors in inputs
+        let errorMessages = [];
+        for (let index = 0; index < keys.length; index++) {
+            // get the input name
+            let key = keys[index];
+            // get the input value
+            let field = config[key];
+
+            if (field) {
+                // if the value is array
+                if (field.length) {
+
+                    field.forEach((childValue, index) => {
+                        let validation = childValue.valid === false ? { valid: childValue.valid, currentErrorMessage: childValue.currentErrorMessage } : validationServices.validateInputValueWithRules(childValue.validationRules, childValue.value);
+                        if (!validation.valid) {
+                            config[key][index] = { ...field[index], ...validation };
+                            errorMessages.push({ ...validation });
+                        }
+                    });
+                } else {
+                    // let validation = field.valid === false ? {valid:field.valid,currentErrorMessage:field.currentErrorMessage}:validationService.validateAgainstRules(field.validationRules,field.value);
+                    let validation = validationServices.validateInputValueWithRules(field.validationRules, field.value);
+                    if (!validation.valid) {
+                        config[key] = { ...field, ...validation };
+                        errorMessages.push({ ...validation });
+                    }
+                }
+            }
+        }
+        this.setState(config);
+
+        console.log(config);
+        return false;
     }
     render() {
         const { days, months, years } = this.state;
@@ -116,7 +204,22 @@ class Signup extends React.Component {
                             </Grid.Row>
                             <Grid.Row>
                                 <Grid.Column>
-                                    <Input name={'userPassword'} onChange={this._handleInputChange} fluid placeholder='Password' type='password' />
+                                    <Popup
+                                        style={{ backgroundColor: 'red', opacity: '0.8' }}
+                                        inverted
+                                        trigger={
+                                            <Input
+                                                error={!!this.state.userPassword.currentErrorMessage}
+                                                name={'userPassword'}
+                                                onChange={this._handleInputChange}
+                                                fluid placeholder='Password'
+                                                type='password' />
+                                        }
+                                        content={this.state.userPassword.currentErrorMessage}
+                                        header={'Error Message !'}
+                                        on={'focus'}
+                                        open={!!this.state.userPassword.currentErrorMessage}
+                                    />
                                 </Grid.Column>
                             </Grid.Row>
                             <Grid.Row textAlign={'left'}><Header size={'small'} inverted>Birthday</Header></Grid.Row>
