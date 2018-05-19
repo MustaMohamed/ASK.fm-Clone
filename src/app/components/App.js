@@ -3,8 +3,12 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import {appActions} from '../actions/app.action';
 import  router  from '../router/router';
+import { Container } from 'semantic-ui-react';
+
+
 // CSS stye
 // import style from '../css/style.css';
+
 
 class App extends React.Component {
 
@@ -41,9 +45,10 @@ class App extends React.Component {
 	}
 	render() {
 		return (
-			<div>
+			<Container fluid>
 				{router}
-			</div>
+				<div style={{height: '600px'}}/>
+			</Container>
 		);
 	}
 }

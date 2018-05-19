@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rollup -c",
     "watch": "rollup -c --watch",
-    "reload": "livereload -p 3000 \"build/\"",
+    "reload": "livereload \"build/\"",
     "dev": "concurrently --kill-others \"npm run watch\" \"npm run reload\""
   },
   "repository": {
@@ -60,6 +60,8 @@
     "ansi-regex": "^3.0.0",
     "babel-loader": "^7.1.4",
     "firebase": "^5.0.3",
+    "moment": "^2.22.1",
+    "react-datepicker": "^1.4.1",
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.2.2",
     "redux": "^4.0.0",

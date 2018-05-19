@@ -17,24 +17,6 @@ class HomePage extends React.Component {
             dispatch: PropTypes.func
         };
     }
-	/*
-		// first render
-		constructor()
-		static getDerivedStateFromProps()
-		componentWillMount() / UNSAFE_componentWillMount()
-		render()
-		componentDidMount()
-	*/
-	/**
-	*	component Update
-	*  componentWillReceiveProps() / UNSAFE_componentWillReceiveProps()
-		static getDerivedStateFromProps()
-		shouldComponentUpdate()
-		componentWillUpdate() / UNSAFE_componentWillUpdate()
-		render()
-		getSnapshotBeforeUpdate()
-		componentDidUpdate()
-	 */
     componentDidMount() {
     }
     render() {

@@ -1,6 +1,6 @@
 
 const initialState = {
-    message: 'Hello'
+    message: null
 };
 
 export function app(state = initialState, action) {

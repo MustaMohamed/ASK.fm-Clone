@@ -37,7 +37,7 @@ export default {
 		}),
 		builtins(),
 		postcss({
-			extensions: ['.css', '.sss'],
+			extensions: ['.css', '.sss', 'less'],
 			extract: './build/css/main.css',
 			modules: true,
 			plugins: [

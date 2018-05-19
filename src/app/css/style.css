@@ -1,7 +1,12 @@
+@import './components/pages/signup.css';
+
 * {
     box-sizing: border-box;
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
+}
+body {
+    background-color: #2d3436 !important;
 }
 .container {
     width: 80%;
