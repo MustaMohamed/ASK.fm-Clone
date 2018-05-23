@@ -10,14 +10,14 @@ export const validationConstants = {
     },
     notLongerThan: {
         type: 'notLongerThan',
-        defaultMessage: 'This value can\'t be longer than {validationLength}.',
+        defaultMessage: 'This value can\'t be longer than: ',
         values: {
             validationLength: 0
         }
     },
     notLessThan: {
         type: 'notLessThan',
-        defaultMessage: 'This value can\'t be less than {validationLength}.',
+        defaultMessage: 'This value can\'t be less than: ',
         values: {
             validationLength: 0
         }
@@ -36,7 +36,7 @@ export const validationConstants = {
     },
     contains: {
         type: 'contains',
-        defaultMessage: 'This value doesn\'t contain required value.',
+        defaultMessage: 'This value doesn\'t contain required value: ',
         values: {
             validationText: ''
         }

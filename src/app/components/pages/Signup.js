@@ -3,17 +3,12 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {
     Container, Menu, Button, Header,
-    Divider, Icon, Grid, Input, Dropdown,
-    Popup
+    Divider, Icon, Grid, Dropdown, Label,
 } from 'semantic-ui-react';
-import { validationConstants } from '../../utils/constants/index';
+import { validationConstants } from '../../constants/index';
 import { userActions } from '../../actions/index';
 import { validationServices } from '../../services/index';
-
-// CSS stye
-// import style from '../../css/style.css';
-// date=icker style
-import 'react-datepicker/dist/react-datepicker.css';
+import TextBox from '../generic/TextBox';
 
 class Signup extends React.Component {
 
@@ -53,78 +48,71 @@ class Signup extends React.Component {
                     { ...validationConstants.notLessThan, values: { validationLength: 6 } }
                 ]
             },
-            userBirthday: {},
+            userBirthday: {
+                day: 0,
+                month: 0,
+                year: 0
+            },
             error: false
         };
         this._submit = this._submit.bind(this);
         this._handleInputChange = this._handleInputChange.bind(this);
+        this._handleDateChange = this._handleDateChange.bind(this);
     }
     static get propTypes() {
         return {
             dispatch: PropTypes.func,
-            user: PropTypes.object
+            user: PropTypes.object,
+            history: PropTypes.object
         };
     }
-	/*
-		// first render
-		constructor()
-		static getDerivedStateFromProps()
-		componentWillMount() / UNSAFE_componentWillMount()
-		render()
-		componentDidMount()
-	*/
-	/**
-	*	component Update
-	*  componentWillReceiveProps() / UNSAFE_componentWillReceiveProps()
-		static getDerivedStateFromProps()
-		shouldComponentUpdate()
-		componentWillUpdate() / UNSAFE_componentWillUpdate()
-		render()
-		getSnapshotBeforeUpdate()
-		componentDidUpdate()
-	 */
 
-    UNSAFE_componentWillReceiveProps() {
-    }
-    componentDidMount() {
+    UNSAFE_componentWillReceiveProps(newProps) {
+        if(newProps.user.key) {
+            this.props.history.push('/');
+        }
     }
 
-    _handleInputChange(e, data) {
-        // console.log(data);
-        let inputName = data.name, inputValue = data.value;
+    _handleInputChange(inputName, inputValue) {
         this.setState(Object.assign(this.state, {
-            [inputName]: Object.assign(this.state[inputName], {
-                ...this.state[inputName],
-                value: inputValue
+            [inputName]: inputValue
+        }));
+    }
+
+    _handleDateChange(e, data) {
+        this.setState(Object.assign(this.state, {
+            userBirthday: Object.assign({}, {
+                ...this.state.userBirthday,
+                [data.placeholder]: data.value
             })
         }));
     }
 
     _submit() {
-        if (this._registerValid()) {
+        if (!this._registerValid()) {
             const { userEmail, userFullName, userName, userPassword, userBirthday } = this.state;
+            this.setState({ error: false });
             let userData = {
                 fullName: userFullName.value,
                 userName: userName.value,
                 email: userEmail.value,
                 password: userPassword.value,
-                birthday: userBirthday,
+                birthday: userBirthday.day + '/' + userBirthday.month + '/' + userBirthday.year
             };
             const { dispatch } = this.props;
             dispatch(userActions.Register(userData));
         } else {
             this.setState({ error: true });
-            console.log(!!this.state.userPassword.currentErrorMessage);
         }
     }
 
     _registerValid() {
         // values to validate
-        const keys = ['userPassword', 'userFullName', 'userName', 'userEmail', 'userBirthday'];
+        const keys = ['userPassword', 'userFullName', 'userName', 'userEmail'];
 
         // prev state
         let config = this.state;
-
+        // console.log(config);
         // errors in inputs
         let errorMessages = [];
         for (let index = 0; index < keys.length; index++) {
@@ -136,7 +124,6 @@ class Signup extends React.Component {
             if (field) {
                 // if the value is array
                 if (field.length) {
-
                     field.forEach((childValue, index) => {
                         let validation = childValue.valid === false ? { valid: childValue.valid, currentErrorMessage: childValue.currentErrorMessage } : validationServices.validateInputValueWithRules(childValue.validationRules, childValue.value);
                         if (!validation.valid) {
@@ -154,11 +141,12 @@ class Signup extends React.Component {
                 }
             }
         }
+        if (!(this.state.userBirthday.day && this.state.userBirthday.month && this.state.userBirthday.year))
+            errorMessages.push(1);
         this.setState(config);
-
-        console.log(config);
-        return false;
+        return errorMessages.length;
     }
+
     render() {
         const { days, months, years } = this.state;
         return (
@@ -174,7 +162,7 @@ class Signup extends React.Component {
                 </Menu>
                 <Grid stackable centered>
                     <Grid.Column width={8}>
-                        <Grid stackable container centered>
+                        <Grid centered>
                             <Grid.Row>
                                 <Divider inverted horizontal>Signup with</Divider>
                             </Grid.Row>
@@ -189,49 +177,79 @@ class Signup extends React.Component {
                             </Grid.Row>
                             <Grid.Row centered columns={1}>
                                 <Grid.Column>
-                                    <Input name={'userEmail'} onChange={this._handleInputChange} fluid placeholder='Email' />
+                                    <TextBox
+                                        inputError={this.state.error}
+                                        inputName={'userEmail'}
+                                        onInputValueChange={this._handleInputChange}
+                                        inputValue={this.state.userEmail}
+                                        fluid placeholder='Email' />
                                 </Grid.Column>
                             </Grid.Row>
                             <Grid.Row>
                                 <Grid.Column>
-                                    <Input name={'userFullName'} onChange={this._handleInputChange} fluid placeholder='Full Name' />
+                                    <TextBox
+                                        inputError={this.state.error}
+                                        inputName={'userFullName'}
+                                        inputValue={this.state.userFullName}
+                                        onInputValueChange={this._handleInputChange}
+                                        fluid placeholder='Full Name' />
                                 </Grid.Column>
                             </Grid.Row>
                             <Grid.Row>
                                 <Grid.Column>
-                                    <Input name={'userName'} onChange={this._handleInputChange} fluid placeholder='User Name' />
+                                    <TextBox
+                                        inputValue={this.state.userName}
+                                        inputName={'userName'}
+                                        inputError={this.state.error}
+                                        onInputValueChange={this._handleInputChange}
+                                        fluid placeholder='User Name' />
                                 </Grid.Column>
                             </Grid.Row>
                             <Grid.Row>
                                 <Grid.Column>
-                                    <Popup
-                                        style={{ backgroundColor: 'red', opacity: '0.8' }}
-                                        inverted
-                                        trigger={
-                                            <Input
-                                                error={!!this.state.userPassword.currentErrorMessage}
-                                                name={'userPassword'}
-                                                onChange={this._handleInputChange}
-                                                fluid placeholder='Password'
-                                                type='password' />
-                                        }
-                                        content={this.state.userPassword.currentErrorMessage}
-                                        header={'Error Message !'}
-                                        on={'focus'}
-                                        open={!!this.state.userPassword.currentErrorMessage}
-                                    />
+                                    <TextBox
+                                        fluid placeholder={'Password'}
+                                        inputError={this.state.error}
+                                        inputName={'userPassword'}
+                                        inputType={'password'}
+                                        inputValue={this.state.userPassword}
+                                        onInputValueChange={this._handleInputChange} />
                                 </Grid.Column>
                             </Grid.Row>
-                            <Grid.Row textAlign={'left'}><Header size={'small'} inverted>Birthday</Header></Grid.Row>
-                            <Grid.Row columns={3}>
+                            <Grid.Row>
+                                    <Header size={'small'} inverted>Birthday</Header>
+                            </Grid.Row>
+                            <Grid.Row columns={4}>
                                 <Grid.Column width={5}>
-                                    <Dropdown fluid search placeholder='Day' selection options={days} />
+                                    <Dropdown
+                                        error={this.state.error && this.state.userBirthday.day === 0}
+                                        // value={this.state.userBirthday.day}
+                                        fluid search placeholder='day'
+                                        onChange={this._handleDateChange}
+                                        selection options={days} />
                                 </Grid.Column>
                                 <Grid.Column width={5}>
-                                    <Dropdown fluid search placeholder='Month' selection options={months} />
+                                    <Dropdown
+                                        error={this.state.error && this.state.userBirthday.month === 0}
+                                        // value={this.state.userBirthday.month}
+                                        fluid search placeholder='month'
+                                        onChange={this._handleDateChange}
+                                        selection options={months} />
                                 </Grid.Column>
                                 <Grid.Column width={6}>
-                                    <Dropdown fluid search placeholder='year' selection options={years} />
+                                    <Dropdown
+                                        error={this.state.error && this.state.userBirthday.year === 0}
+                                        // value={this.state.userBirthday.year}
+                                        fluid search placeholder='year'
+                                        onChange={this._handleDateChange}
+                                        selection options={years} />
+                                </Grid.Column>
+                                 
+                                <Grid.Column width={16} textAlign={'center'}>
+                                    {
+                                        this.state.error && (!this.state.userBirthday.day || !this.state.userBirthday.month || !this.state.userBirthday.year) ?
+                                            <Label basic color='red' position={'bellow'} pointing>Please Enter a valid Birthday !</Label> : null
+                                    }
                                 </Grid.Column>
                             </Grid.Row>
                             <Grid.Row>

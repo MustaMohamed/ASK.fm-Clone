@@ -1,4 +1,4 @@
-import { validationConstants } from '../utils/constants/index';
+import { validationConstants } from '../constants/index';
 
 
 export const validationServices = {
@@ -55,7 +55,7 @@ export const validationServices = {
         return validateResult;
     },
 
-     // define small function that run the rules
+    // define small function that run the rules
 
     notNull: (value, rule) => {
         let valid = (!!value);
@@ -92,12 +92,16 @@ function createErrorObject(valid, validationConstant) {
     if (valid)
         return { valid };
     else {
-        
-        let valLength = validationConstant.values ? validationConstant.values.validationLength + '' : '';
+        let secondPartMessage = '';
+        if (validationConstant.values && validationConstant.values.validationLength)
+            secondPartMessage += ' ' + validationConstant.values.validationLength;
+        else if (validationConstant.values && validationConstant.values.validationText)
+            secondPartMessage += ' ' + validationConstant.values.validationText;
+        else if (validationConstant.values && validationConstant.values.firstInput)
+            secondPartMessage += ' ' + validationConstant.values.firstInput + ' != ' + validationConstant.values.secondInput;
         return {
             valid,
-            currentErrorMessage: !validationConstant.values ? validationConstant.defaultMessage 
-                : validationConstant.defaultMessage + ' ' + valLength
+            currentErrorMessage: validationConstant.defaultMessage + ' ' + secondPartMessage
         };
     }
 }
