@@ -59,7 +59,7 @@
   "dependencies": {
     "ansi-regex": "^3.0.0",
     "babel-loader": "^7.1.4",
-    "bcrypt": "^2.0.1",
+    "bcrypt": "^5.0.0",
     "firebase": "^5.0.3",
     "moment": "^2.22.1",
     "react-datepicker": "^1.4.1",
